@@ -1,0 +1,7 @@
+"Domain verification record set:"
+"Record name","Record type","Record Value"
+"_amazonses.zayirna.aws-cic.io","TXT","Qt5RLeSl0vW+6/LUh7q4y4ez2394K1Km3bt4JC6wxsY="
+
+"Alternate domain verification record:"
+"Record name","Record type","Record Value"
+"zayirna.aws-cic.io","TXT","amazonses:Qt5RLeSl0vW+6/LUh7q4y4ez2394K1Km3bt4JC6wxsY="

@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>Zayirna Real-time Dashboard</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
+  <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+	<script src="js/amazon-cognito-auth.min.js"></script>
+	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.7.16.min.js"></script>
+	<script src="js/amazon-cognito-identity.min.js"></script>
+	<script src="js/app.js"></script>
+  <script> verifyPageAccess();</script>
+
+
+  <script type="text/javascript" src="js/apiGateway-js-sdk-Archives/lib/axios/dist/axios.standalone.js"></script>
+  <script type="text/javascript" src="js/apiGateway-js-sdk-Archives/lib/CryptoJS/rollups/hmac-sha256.js"></script>
+  <script type="text/javascript" src="js/apiGateway-js-sdk-Archives/lib/CryptoJS/rollups/sha256.js"></script>
+  <script type="text/javascript" src="js/apiGateway-js-sdk-Archives/lib/CryptoJS/components/hmac.js"></script>
+  <script type="text/javascript" src="js/apiGateway-js-sdk-Archives/lib/CryptoJS/components/enc-base64.js"></script>
+  <script type="text/javascript" src="js/apiGateway-js-sdk-Archives/lib/url-template/url-template.js"></script>
+  <script type="text/javascript" src="js/apiGateway-js-sdk-Archives/lib/apiGatewayCore/sigV4Client.js"></script>
+  <script type="text/javascript" src="js/apiGateway-js-sdk-Archives/lib/apiGatewayCore/apiGatewayClient.js"></script>
+  <script type="text/javascript" src="js/apiGateway-js-sdk-Archives/lib/apiGatewayCore/simpleHttpClient.js"></script>
+  <script type="text/javascript" src="js/apiGateway-js-sdk-Archives/lib/apiGatewayCore/utils.js"></script>
+  <script type="text/javascript" src="js/apiGateway-js-sdk-Archives/apigClient.js"></script>
+</head>
+
+
+<script>
+//connect to rest api
+var apigClient = apigClientFactory.newClient();
+
+
+// get aggregates data and display it when user first opens up page
+apigClient.aggregatesGet({}, null, {})
+.then(function(result){
+  //read the json data and parse it into a js object to read the values
+  var aggregatesObject = result.data;
+
+  //var aggregatesObject = JSON.parse(updatedAggregates);
+
+  //save new values in variables
+  var currentAdults = aggregatesObject[0].aggregateValue;
+  var currentChildren = aggregatesObject[1].aggregateValue;
+  var currentFemales = aggregatesObject[2].aggregateValue;
+  var currentMales = aggregatesObject[3].aggregateValue;
+  var currentRedundant = aggregatesObject[4].aggregateValue;
+  var currentUnique = aggregatesObject[5].aggregateValue;
+
+
+
+  if (currentUnique == 0 && currentRedundant == 0){
+    alert("There is no event currently running. You will be redirected to event archives page.")
+    window.location.href = "archives.html";
+  }
+
+  //update bars up top (unique and redundant)
+  document.getElementById("numOfUniqueBar").innerHTML = currentUnique;
+  document.getElementById("numOfRedundantBar").innerHTML = currentRedundant;
+
+  // update the barchart with new data
+  barChartData.datasets[0].data = [currentUnique, currentRedundant, currentAdults, currentChildren, currentMales, currentFemales];
+  barChart.update();
+
+  //update pie chart (adult vs children)
+  pieChartData.datasets[0].data = [currentAdults, currentChildren];
+  pieChart.update();
+
+  //update pie chart (males to females)
+  pieChart2Data.datasets[0].data = [currentMales, currentFemales];
+  pie2Chart.update();
+
+
+  //update totals pie chart
+  CurrentTotalsPieData.datasets[0].data = [currentMales, currentFemales, currentChildren, currentAdults, currentUnique, currentRedundant];
+  CurrentTotalsPieChart.update();
+
+  //update the list of segmented visitor Totals
+  document.getElementById("numOfAdults").innerHTML = currentAdults;
+  document.getElementById("numOfChildren").innerHTML = currentChildren;
+  document.getElementById("numOfMales").innerHTML = currentMales;
+  document.getElementById("numOfFemales").innerHTML = currentFemales;
+  document.getElementById("numOfRedundant").innerHTML = currentRedundant;
+  document.getElementById("numOfUnique").innerHTML = currentUnique;
+
+
+
+  }).catch( function(result){
+      //This is where you would put an error callback
+  });
+
+
+</script>
+  <script>
+  //connect to websocket api
+  var connection = new WebSocket('wss://8wv8wzrnql.execute-api.us-east-1.amazonaws.com/dev')
+
+  //declare array for deeplenses
+  var deeplensArray = [];
+
+  //whenever a message (new aggregates) is recieved from the server
+  connection.onmessage = function(event) {
+
+    //read the json data and parse it into a js object to read the values
+    let updatedAggregates = event.data;
+    var aggregatesObject = JSON.parse(updatedAggregates);
+
+    //save new values in variables
+    var currentAdults = aggregatesObject[0]['aggregateValue'];
+    var currentChildren = aggregatesObject[1]['aggregateValue'];
+    var currentFemales = aggregatesObject[2]['aggregateValue'];
+    var currentMales = aggregatesObject[3]['aggregateValue'];
+    var currentRedundant = aggregatesObject[4]['aggregateValue'];
+    var currentUnique = aggregatesObject[5]['aggregateValue'];
+
+    if(aggregatesObject.length > 6){
+      var ulid = 'deepeLensesStatus';
+      var numberofdl = aggregatesObject.length - 6;
+
+      if(numberofdl >= 1){
+        var deepNum = '1';
+        var newName = ulid.concat(deepNum);
+        var ullidiv = document.getElementById(newName);
+        ullidiv.innerHTML = 'Camera Name: <b>'+ aggregatesObject[6]['deepLensName'] +'</b> &nbsp;&nbsp; Last connection: <b>'+aggregatesObject[6]['lastHeartBeat']+'</b>';
+      } if(numberofdl >= 2){
+        var deepNum = '2';
+        var newName = ulid.concat(deepNum);
+        var ullidiv = document.getElementById(newName);
+        ullidiv.innerHTML = 'Camera Name: <b>'+ aggregatesObject[7]['deepLensName'] +'</b> &nbsp;&nbsp; Last connection: <b>'+aggregatesObject[7]['lastHeartBeat']+'</b>';
+      } if(numberofdl >= 3){
+        var deepNum = '3';
+        var newName = ulid.concat(deepNum);
+        var ullidiv = document.getElementById(newName);
+        ullidiv.innerHTML = 'Camera Name: <b>'+ aggregatesObject[8]['deepLensName'] +'</b> &nbsp;&nbsp; Last connection: <b>'+aggregatesObject[8]['lastHeartBeat']+'</b>';
+      } if(numberofdl >= 4){
+        var deepNum = '4';
+        var newName = ulid.concat(deepNum);
+        var ullidiv = document.getElementById(newName);
+        ullidiv.innerHTML = 'Camera Name: <b>'+ aggregatesObject[9]['deepLensName'] +'</b> &nbsp;&nbsp; Last connection: <b>'+aggregatesObject[9]['lastHeartBeat']+'</b>';
+      } if(numberofdl >= 5){
+        var deepNum = '5';
+        var newName = ulid.concat(deepNum);
+        var ullidiv = document.getElementById(newName);
+        ullidiv.innerHTML = 'Camera Name: <b>'+ aggregatesObject[10]['deepLensName'] +'</b> &nbsp;&nbsp; Last connection: <b>'+aggregatesObject[10]['lastHeartBeat']+'</b>';
+      } if(numberofdl >= 6){
+        var deepNum = '6';
+        var newName = ulid.concat(deepNum);
+        var ullidiv = document.getElementById(newName);
+        ullidiv.innerHTML = 'Camera Name: <b>'+ aggregatesObject[11]['deepLensName'] +'</b> &nbsp;&nbsp; Last connection: <b>'+aggregatesObject[11]['lastHeartBeat']+'</b>';
+      } if(numberofdl >= 7){
+        var deepNum = '7';
+        var newName = ulid.concat(deepNum);
+        var ullidiv = document.getElementById(newName);
+        ullidiv.innerHTML = 'Camera Name: <b>'+ aggregatesObject[12]['deepLensName'] +'</b> &nbsp;&nbsp; Last connection: <b>'+aggregatesObject[12]['lastHeartBeat']+'</b>';
+      } if(numberofdl >= 8){
+        var deepNum = '8';
+        var newName = ulid.concat(deepNum);
+        var ullidiv = document.getElementById(newName);
+        ullidiv.innerHTML = 'Camera Name: <b>'+ aggregatesObject[13]['deepLensName'] +'</b> &nbsp;&nbsp; Last connection: <b>'+aggregatesObject[13]['lastHeartBeat']+'</b>';
+      } if(numberofdl >= 9){
+        var deepNum = '9';
+        var newName = ulid.concat(deepNum);
+        var ullidiv = document.getElementById(newName);
+        ullidiv.innerHTML = 'Camera Name: <b>'+ aggregatesObject[14]['deepLensName'] +'</b> &nbsp;&nbsp; Last connection: <b>'+aggregatesObject[14]['lastHeartBeat']+'</b>';
+      } if(numberofdl >= 10){
+        var deepNum = '10';
+        var newName = ulid.concat(deepNum);
+        var ullidiv = document.getElementById(newName);
+        ullidiv.innerHTML = 'Camera Name: <b>'+ aggregatesObject[15]['deepLensName'] +'</b> &nbsp;&nbsp; Last connection: <b>'+aggregatesObject[15]['lastHeartBeat']+'</b>';
+      } if(numberofdl >= 11){
+        var deepNum = '11';
+        var newName = ulid.concat(deepNum);
+        var ullidiv = document.getElementById(newName);
+        ullidiv.innerHTML = 'Camera Name: <b>'+ aggregatesObject[16]['deepLensName'] +'</b> &nbsp;&nbsp; Last connection: <b>'+aggregatesObject[16]['lastHeartBeat']+'</b>';
+      }
+    }
+
+
+    //update bars up top (unique and redundant)
+    document.getElementById("numOfUniqueBar").innerHTML = currentUnique;
+    document.getElementById("numOfRedundantBar").innerHTML = currentRedundant;
+
+    // update the barchart with new data
+    barChartData.datasets[0].data = [currentUnique, currentRedundant, currentAdults, currentChildren, currentMales, currentFemales];
+    barChart.update();
+
+    //update pie chart (adult vs children)
+    pieChartData.datasets[0].data = [currentAdults, currentChildren];
+    pieChart.update();
+
+    //update pie chart (males to females)
+    pieChart2Data.datasets[0].data = [currentMales, currentFemales];
+    pie2Chart.update();
+
+
+    //update totals pie chart
+    CurrentTotalsPieData.datasets[0].data = [currentMales, currentFemales, currentChildren, currentAdults, currentUnique, currentRedundant];
+    CurrentTotalsPieChart.update();
+
+    //update the list of segmented visitor Totals
+    document.getElementById("numOfAdults").innerHTML = currentAdults;
+    document.getElementById("numOfChildren").innerHTML = currentChildren;
+    document.getElementById("numOfMales").innerHTML = currentMales;
+    document.getElementById("numOfFemales").innerHTML = currentFemales;
+    document.getElementById("numOfRedundant").innerHTML = currentRedundant;
+    document.getElementById("numOfUnique").innerHTML = currentUnique;
+    // document.getElementById("deepeLensesStatus").innerHTML = deeplenshtml;
+
+
+  };
+
+  </script>
+
+</head>
+<body>
+
+  <div class="container-fluid p-0">
+    <nav class="navbar fixed-top navbar-dark bg-dark navbar-expand-md" >
+        <a href="index.html" class="navbar-brand">Zayirna App</a>
+        <div id="toggler-div">
+          <button class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbar-items" aria-controls="navbar-items"
+            aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </div>
+        <ul class="navbar-nav order-2 d-none d-md-block">
+          <li class="nav-item">
+            <span class="navbar-text">
+              Welcome back,
+            </span>
+            <a class="nav-link user-name-link dropdown-toggle" href="#" id="user-dropdown-1" data-toggle="dropdown" style="display: inline-block;">
+              <span id="usernameDashboard" ></span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="user-dropdown-1" id="dropdownlist">
+              <a class="dropdown-item" href="#" onclick="signOutButton()"><span class="oi oi-account-logout"></span>&nbsp;&nbsp;Log out</a>
+            </div>
+          </li>
+
+        </ul>
+        <div class="collapse navbar-collapse d-md-none" id="navbar-items">
+          <ul class="navbar-nav mr-100% d-md-none">
+            <li class="nav-item">
+              <span class="navbar-text">
+                Welcome back,&nbsp;&nbsp;
+              </span>
+              <a class="nav-link user-name-link  dropdown-toggle" href="#" id="user-dropdown-2" data-toggle="dropdown" style="display: inline-block;">
+                <span id="usernameDashboard" ></span>
+              </a>
+              <div class="dropdown-menu" aria-labelledby="user-dropdown-2" id="dropdownlist2">
+                <a class="dropdown-item" href="#" onclick="signOutButton()"><span class="oi oi-account-logout"></span>&nbsp;&nbsp;Log out</a>
+              </div>
+            </li>
+             <li class="list-group-item list-group-item-action"><a href="dashboard.html"><span class="oi oi-bar-chart"></span>&nbsp;&nbsp;<b>Dashboard</b></a></li>
+              <li class="list-group-item list-group-item-action"><a href="#"><span class="oi oi-calendar"></span>&nbsp;&nbsp;Schedule Event</a></li>
+              <li class="list-group-item list-group-item-action"><a href="#"><span class="oi oi-pencil"></span>&nbsp;&nbsp;Manage Events</a></li>
+              <li class="list-group-item list-group-item-action"><a href="archives.html"><span class="oi oi-book"></span>&nbsp;&nbsp;Event Archives</a></li>
+          </ul>
+        </div>
+    </nav>
+    <div class="row" id="content-navbar-row" style="height:100%;">
+    <nav class="d-none d-md-block" id="sidebar">
+      <ul class="list-group">
+        <li class="list-group-item list-group-item-action"><a href="dashboard.html"><span class="oi oi-bar-chart"></span>&nbsp;&nbsp;<b>Dashboard</b></a></li>
+        <li class="list-group-item list-group-item-action"><a href="#"><span class="oi oi-calendar"></span>&nbsp;&nbsp;Schedule Event</a></li>
+        <li class="list-group-item list-group-item-action"><a href="#"><span class="oi oi-pencil"></span>&nbsp;&nbsp;Manage Events</a></li>
+        <li class="list-group-item list-group-item-action"><a href="archives.html"><span class="oi oi-book"></span>&nbsp;&nbsp;Event Archives</a></li>
+      </ul>
+    </nav>
+      <div class="col-sm-12 main">
+
+        <div class="row" id="row-2">
+          <div class="col-12 col-sm-6 top-number-col">
+            <div class="card top-number-card" style="background-color:#f95d6a;">
+              <div class="card-body text-white">
+                <h2><p id="numOfUniqueBar"></p></h2>
+                <h5>Unique visitors</h5>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 top-number-col">
+            <div class="card top-number-card "  style="background-color:#003f5c;">
+              <div class="card-body text-white">
+                <h2><p id="numOfRedundantBar"></h2>
+                <h5>Redundant visitors</h5>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12 col-lg-6 dash-panel-col">
+            <div class="card dash-panel">
+              <h5 class="card-header">Males to Females</h5>
+              <div class="card-body">
+                <div class="chart-div" id="revenue-chart-div">
+                  <canvas id="MalesToFemalesChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-lg-6 dash-panel-col">
+            <div class="card dash-panel">
+              <h5 class="card-header">Adults to Children</h5>
+              <div class="card-body">
+                <div class="chart-div" id="expense-chart-div">
+                  <canvas id="adultToChildChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12 col-lg-6 dash-panel-col">
+            <div class="card dash-panel">
+              <h5 class="card-header">Current Totals - Bar </h5>
+              <div class="card-body">
+                <canvas id="canvas"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-lg-6 dash-panel-col">
+            <div class="card dash-panel">
+              <h5 class="card-header">Current Totals - Pie</h5>
+              <div class="card-body">
+                <canvas id="PieTotals"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      <div class="row">
+        <div class="col-12 col-lg-6 dash-panel-col">
+          <div class="card dash-panel">
+            <h5 class="card-header">Current Totals - List</h5>
+            <div class="card-body">
+              <ul class="list-group property-list" id="available-list" role="tablist">
+
+
+                <li class="list-group-item"><span class="available-price float-right"><p id="numOfUnique"></p></span><b>Number of Unique Visitors</b></li>
+                <li class="list-group-item"><span class="available-price float-right"><p id="numOfRedundant"></p></span><b>Number of Redundant Visitors</b></li>
+                <li class="list-group-item "><span class="available-price float-right"><p id="numOfAdults"></p></span><b>Number of Adults</b></li>
+                <li class="list-group-item"><span class="available-price float-right"><p id="numOfChildren"></p></span><b>Number of Children</b></li>
+                <li class="list-group-item"><span class="available-price float-right"><p id="numOfMales"></p></span><b>Number of Males</b></li>
+                <li class="list-group-item"><span class="available-price float-right"><p id="numOfFemales"></p></span><b>Number of Females</b></li>
+
+
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6 dash-panel-col">
+          <div class="card dash-panel">
+            <h5 class="card-header">DeepLenses Status</h5>
+            <div class="card-body">
+              <!-- <div id="deepeLensesStatus"></div> -->
+              <ul class="list-group property-list" id="available-list" role="tablist">
+
+
+                <li class="list-group-item" style="text-align: left;" id="deepeLensesStatus1"></li>
+                <li class="list-group-item" style="text-align: left;" id="deepeLensesStatus2"></li>
+                <li class="list-group-item" style="text-align: left;" id="deepeLensesStatus3"></li>
+                <li class="list-group-item" style="text-align: left;" id="deepeLensesStatus4"></li>
+                <li class="list-group-item" style="text-align: left;" id="deepeLensesStatus5"></li>
+                <li class="list-group-item" style="text-align: left;" id="deepeLensesStatus6"></li>
+                <li class="list-group-item" style="text-align: left;" id="deepeLensesStatus7"></li>
+                <li class="list-group-item" style="text-align: left;" id="deepeLensesStatus8"></li>
+                <li class="list-group-item" style="text-align: left;" id="deepeLensesStatus9"></li>
+                <li class="list-group-item" style="text-align: left;" id="deepeLensesStatus10"></li>
+                <li class="list-group-item" style="text-align: left;" id="deepeLensesStatus11"></li>
+
+
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      </div>
+        </div>
+      </div>
+    </div>
+
+  <script src="js/jquery-3.3.1.slim.min.js"></script>
+  <script src="js/popper.min.js" ></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/Chart.min.js"></script>
+  <script>
+
+    //bar chart
+    var barsLabels = ["Unique", "Redundant", "Adults", "Children", "Males", "Females"];
+          var barChartData = {
+              labels: barsLabels,
+              datasets: [{
+                  label: 'Total Unique',
+                  fillColor: "rgba(151,187,205,0.2)",
+                  strokeColor: "rgba(151,187,205,1)",
+                  pointColor: "rgba(151,187,205,1)",
+                  pointStrokeColor: "#fff",
+                  pointHighlightFill: "#fff",
+                  pointHighlightStroke: "rgba(151,187,205,1)",
+                  data: [],
+                  backgroundColor: [
+                      "#f95d6a",
+                      "#ff7c43",
+                      "#ffa600",
+                      "#955196",
+                      "#003f5c",
+                      "#dd5182"
+
+
+                  ],
+
+              }]
+          }
+
+          var ctx = document.getElementById("canvas").getContext("2d");
+
+          var barChart = new Chart(ctx,{
+            type: 'bar',
+            data: barChartData,
+            options: {responsive: true,
+            barValueSpacing: 2,
+            scaleShowGridLines: false
+          }
+          });
+
+    //pie Chart adults vs children
+    var pieLabels = ["Adults", "Children"];
+    var pieCtx = document.getElementById('adultToChildChart').getContext('2d');
+    var pieChartData = {
+      labels: pieLabels,
+      datasets: [
+        {
+          label: 'Adults to Children',
+          data: [],
+          backgroundColor: [
+            "#ffa600",
+            "#955196"
+            //"#46BFBD"
+
+          ],
+
+        }
+      ]
+    };
+    var pieChart = new Chart(pieCtx, {
+      type: 'doughnut',
+      data:pieChartData,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+
+    //pie Chart Males vs Females
+    var pie2Labels = ["Males", "Females"];
+    var pie2Ctx = document.getElementById('MalesToFemalesChart').getContext('2d');
+    var pieChart2Data = {
+      labels: pie2Labels,
+      datasets: [
+        {
+          label: 'Males to Femlaes',
+          data: [],
+          backgroundColor: [  "#003f5c",
+          "#d45087"
+          ]
+        }
+      ]
+    };
+    var pie2Chart = new Chart(pie2Ctx, {
+      type: 'doughnut',
+      data:pieChart2Data,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+
+    //pie Chart Current totals
+    var CurrentTotalsPieLabels = ["Males", "Females", "Children", "Adults", "unique", "Redundant"];
+    var CurrentTotalsCtx = document.getElementById('PieTotals').getContext('2d');
+    var CurrentTotalsPieData = {
+      labels: CurrentTotalsPieLabels,
+      datasets: [
+        {
+          label: '',
+          data: [],
+          backgroundColor: [  "#003f5c",
+                "#444e86",
+                "#955196",
+                "#dd5182",
+                "#ff6e54",
+                "#ffa600"
+          ]
+        }
+      ]
+    };
+    var CurrentTotalsPieChart = new Chart(CurrentTotalsCtx, {
+      type: 'pie',
+      data:CurrentTotalsPieData,
+      options: {
+        responsive: true
+      }
+    });
+
+
+
+
+
+
+    </script>
+    <script>   renderName();
+      renderAdminTabs();</script>
+  <!-- open-iconic-bootstrap (icon set for bootstrap) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css" integrity="sha256-BJ/G+e+y7bQdrYkS2RBTyNfBHpA9IuGaPmf9htub5MQ=" crossorigin="anonymous" />
+</html>

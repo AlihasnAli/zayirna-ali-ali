@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script type="text/javascript">
+		
+		// Store values of burrons in local storage and send to the emotion page
+		function callEmotion(){
+			var eventID =document.getElementById('emotionBtn').getAttribute('value');
+			// alert(eventID)
+			localStorage.setItem("eventID", eventID);
+			// window.location.href = "visitor-emotion.html";
+		}
+
+
+	</script>
+</head>
+<body>
+
+	<button onclick="callEmotion()" id="emotionBtn" > Emotion </button>
+
+
+	<div id="divName" class="divName">
+		
+	</div>
+
+	<script type="text/javascript">
+		
+		var apiArray = ["23","23","42","23"];
+
+		// loop through the api 
+		for(i=0; i < apiArray.length ; i++){
+
+			// Get the eventID
+			// var eachEventID = apiArray[i]['getMethodResourceName'][0]['eventIDAttributeName']
+
+			// Great html tags and append it inside a div (div id here ===> divName)
+			$("div" ).prepend( "<p>Test</p>" );
+			alert("pppp")
+			$('#divName').prepend("<p>This is paragraph</p>");
+
+
+			// Set the values of button (change "event" to eventID varible)
+			document.getElementById("emotionBtn").setAttribute("value", "event");
+
+		}
+
+
+		
+	</script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+  	<title>Zayirna Real - Visitors' Emotion</title>
+  	<link rel="stylesheet" href="css/bootstrap.min.css">
+  	<link rel="stylesheet" href="css/style.css">
+  	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+  	<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+  	<script src="js/amazon-cognito-auth.min.js"></script>
+  	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.7.16.min.js"></script>
+  	<script src="js/amazon-cognito-identity.min.js"></script>
+  	<script src="js/app.js"></script>
+    <script> verifyPageAccess();</script>
+
+  	<script type="text/javascript" src="js/apiGateway-js-sdk/lib/axios/dist/axios.standalone.js"></script>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/lib/CryptoJS/rollups/hmac-sha256.js"></script>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/lib/CryptoJS/rollups/sha256.js"></script>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/lib/CryptoJS/components/hmac.js"></script>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/lib/CryptoJS/components/enc-base64.js"></script>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/lib/url-template/url-template.js"></script>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/lib/apiGatewayCore/sigV4Client.js"></script>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/lib/apiGatewayCore/apiGatewayClient.js"></script>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/lib/apiGatewayCore/simpleHttpClient.js"></script>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/lib/apiGatewayCore/utils.js"></script>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/apigClient.js"></script>
+</head>
+<body>
+	<div class="mypanel"></div>
+  <div class="container-fluid p-0">
+    <nav class="navbar fixed-top navbar-dark bg-dark navbar-expand-md">
+        <a href="#" class="navbar-brand">Zayirna App</a>
+        <div id="toggler-div">
+          <button class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbar-items" aria-controls="navbar-items"
+            aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </div>
+        <ul class="navbar-nav order-2 d-none d-md-block">
+          <li class="nav-item">
+            <span class="navbar-text">
+              Welcome back,
+            </span>
+            <a class="nav-link user-name-link dropdown-toggle" href="#" id="user-dropdown-1" data-toggle="dropdown" style="display: inline-block;">
+              <span id="usernameDashboard" ></span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="user-dropdown-1" id="dropdownlist">
+              <a class="dropdown-item" href="#" onclick="signOutButton()"><span class="oi oi-account-logout"></span>&nbsp;&nbsp;Log out</a>
+            </div>
+          </li>
+
+        </ul>
+        <div class="collapse navbar-collapse d-md-none" id="navbar-items">
+          <ul class="navbar-nav mr-100% d-md-none">
+            <li class="nav-item">
+              <span class="navbar-text">
+                Welcome back,&nbsp;&nbsp;
+              </span>
+              <a class="nav-link user-name-link  dropdown-toggle" href="#" id="user-dropdown-2" data-toggle="dropdown" style="display: inline-block;">
+                <span id="usernameDashboard" ></span>
+              </a>
+              <div class="dropdown-menu" aria-labelledby="user-dropdown-2" id="dropdownlist2">
+                <a class="dropdown-item" href="#" onclick="signOutButton()"><span class="oi oi-account-logout"></span>&nbsp;&nbsp;Log out</a>
+              </div>
+            </li>
+             <li class="list-group-item list-group-item-action"><a href="dashboard.html"><span class="oi oi-bar-chart"></span>&nbsp;&nbsp;<b>Dashboard</b></a></li>
+              <li class="list-group-item list-group-item-action"><a href="#"><span class="oi oi-calendar"></span>&nbsp;&nbsp;Schedule Event</a></li>
+              <li class="list-group-item list-group-item-action"><a href="#"><span class="oi oi-pencil"></span>&nbsp;&nbsp;Manage Events</a></li>
+              <li class="list-group-item list-group-item-action"><a href="archives.html"><span class="oi oi-book"></span>&nbsp;&nbsp;Event Archives</a></li>
+          </ul>
+        </div>
+    </nav>
+    <div class="row" id="content-navbar-row">
+       <nav class="d-none d-md-block" id="sidebar">
+      <ul class="list-group">
+        <li class="list-group-item list-group-item-action"><a href="dashboard.html"><span class="oi oi-bar-chart"></span>&nbsp;&nbsp;<b>Dashboard</b></a></li>
+        <li class="list-group-item list-group-item-action"><a href="#"><span class="oi oi-calendar"></span>&nbsp;&nbsp;Schedule Event</a></li>
+        <li class="list-group-item list-group-item-action"><a href="#"><span class="oi oi-pencil"></span>&nbsp;&nbsp;Manage Events</a></li>
+        <li class="list-group-item list-group-item-action"><a href="archives.html"><span class="oi oi-book"></span>&nbsp;&nbsp;Event Archives</a></li>
+      </ul>
+    </nav>
+      <div class="col-sm-12 main">      	      
+        <div class="row" id="row-2">
+          <div class="col-12 col-sm-12 top-number-col">
+            <div class="card top-number-card" style="background-color:rgba(0,0,0,.03);">
+              <div class="card-body text-white" >                
+                <h5 style="color: black;">Event Name: </h5><h2 style="color: black;"><p id="eventNameHere"></p></h2>
+
+              </div>
+            </div>
+          </div>          
+        </div>        
+        <div class="row">
+          <div class="col-12 col-lg-6 dash-panel-col">
+            <div class="card dash-panel">
+              <h5 class="card-header">Emotion Based On Gender</h5>
+              <div class="card-body">
+                <div class="chart-div" id="revenue-chart-div">
+                  <canvas id="genderEmotionChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-lg-6 dash-panel-col">
+            <div class="card dash-panel">
+              <h5 class="card-header">Emotion Based On Age Group</h5>
+              <div class="card-body">
+                <div class="chart-div" id="expense-chart-div">
+                  <canvas id="ageGroupEmotionChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12 col-lg-12 dash-panel-col">
+            <div class="card dash-panel">
+              <h5 class="card-header">Visitors' Emotion </h5>
+              <div class="card-body">
+                <canvas id="totalEmotionChart"></canvas>
+              </div>
+            </div>
+          </div>          
+        </div>      
+      </div>
+    </div>
+<script>renderAdminTabs();</script>
+<script src="js/jquery-3.3.1.slim.min.js"></script>
+<script src="js/popper.min.js" ></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/Chart.min.js"></script>
+<script>
+        
+  var dataList = []
+  var eventID = localStorage.getItem("eventID");
+
+  var apigClient = apigClientFactory.newClient();        
+
+  apigClient.emotionsGet({}, null, {})
+  .then(function(result){
+      
+      
+      dataList = result.data
+      for(i=0; i<dataList.length ; i++){
+          
+          if(dataList[i]['emotion'][0]['eventID'] == eventID){
+            // Intialize chart labels & labels   
+            var dataForMale = dataList[i]['emotion'][0]['maleEmotions'];  
+            var dataForFemale = dataList[i]['emotion'][0]['femaleEmotions'];  
+            var dataForAdults = dataList[i]['emotion'][0]['adultsEmotions'];    
+            var dataForChildren = dataList[i]['emotion'][0]['childrenEmotions'];  
+            var totalVisitorEmotions = dataList[i]['emotion'][0]['totalEmotions'];  
+            var overAllLabels = ['SAD', 'CALM', 'ANGRY', 'HAPPY', 'CONFUSED', 'FEAR', 'DISGUSTED', 'SURPRISED'];
+            
+            
+            // Total Emotion 
+            var ctx = document.getElementById('totalEmotionChart').getContext('2d');    
+            var myDoughnutChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: data = {
+                  labels: overAllLabels,
+                  datasets: [{
+                      label: 'Visitor Emotions Based On Category',
+                        backgroundColor: ["#1E81A2","#14607A","#858585","#CECDCD","#E7E7E7","#39F3BB","#0ABB9F","#08A785"],               
+                      data: totalVisitorEmotions
+                  }]   
+                },
+                options: {
+                  responsive: true,
+                  barValueSpacing: 1,
+                  scaleShowGridLines: true
+                }
+            });
+
+
+            
+            // Gender Emotions
+            var ctx = document.getElementById('genderEmotionChart');
+            var myChart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                  labels: overAllLabels,
+                  datasets: [
+                    {
+                      label: 'Male',
+                      data: dataForMale,
+                      backgroundColor: '#013F5C' // green
+                  },
+                  {
+                      label: 'Female',
+                      data: dataForFemale,
+                      backgroundColor: '#D45087' // yellow
+                  }
+                  ]
+              },
+              options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                },
+                responsive: true,
+                maintainAspectRatio: false
+              }
+            });
+
+
+
+            // Age Group Emotions
+            var ctx = document.getElementById('ageGroupEmotionChart');
+            var myChart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                  labels: overAllLabels,
+                  datasets: [
+                    {
+                      label: 'Adults',
+                      data: dataForAdults,
+                      backgroundColor: '#FFA626' 
+                  },
+                  {
+                      label: 'Children',
+                      data: dataForChildren,
+                      backgroundColor: '#955196' 
+                  }
+                  ]
+              },
+              options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                },
+                responsive: true,
+                maintainAspectRatio: false
+              }
+            });
+          }             
+      }            
+
+  }).catch( function(result){
+      //This is where you would put an error callback
+      alert('erorr')
+  }); 
+
+document.getElementById('eventNameHere').innerHTML = localStorage.getItem('eventName');
+</script>
+<script> renderName();</script>
+<!-- open-iconic-bootstrap (icon set for bootstrap) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css" integrity="sha256-BJ/G+e+y7bQdrYkS2RBTyNfBHpA9IuGaPmf9htub5MQ=" crossorigin="anonymous" />
+</html>

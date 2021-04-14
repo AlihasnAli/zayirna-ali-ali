@@ -1,0 +1,64 @@
+<html lang="en">
+<head>
+  <title>Zayirna Real-time Dashboard</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
+  <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+	<script src="js/amazon-cognito-auth.min.js"></script>
+	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.7.16.min.js"></script>
+	<script src="js/amazon-cognito-identity.min.js"></script>
+	<script src="js/app.js"></script>
+
+
+</head>
+<body>
+  <div class="mypanel"></div>
+  <div class="container-fluid p-0">
+    <nav class="navbar fixed-top navbar-dark bg-dark navbar-expand-md">
+        <a href="index.html" class="navbar-brand">Zayirna</a>       
+    </nav>
+    <div class="row" id="content-navbar-row">
+      
+      <div class="col-sm-12 main">
+        <div class="row">
+          <div class="col-2 col-lg-2 dash-panel-col"></div>
+          <div class="col-12 col-lg-6 dash-panel-col">
+            <div class="card dash-panel">
+              <h5 class="card-header">Login</h5>
+              <div class="card-body">
+                
+                  <form  >
+                      <div class="form-group" style="width: auto;">
+                        <label for="exampleInputEmail1">Username</label>
+                        <input type="text" class="form-control" id="inputUsername"  placeholder="Enter username" required autofocus>
+
+                      </div>
+                      <div class="form-group"  style="width: auto;">
+                        <label for="exampleInputPassword1">Password</label>
+                        <input type="password" class="form-control" id="inputPassword" placeholder="Password">
+                      </div>
+
+                      <button type="button" class="btn btn-primary" onclick="signInButton()">Sign in</button>
+                  </form>
+                
+              </div>
+            </div>
+          </div>          
+        </div>      
+      </div>
+    </div>  
+    </div>
+
+  <script src="js/jquery-3.3.1.slim.min.js"></script>
+  <script src="js/popper.min.js" ></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/Chart.min.js"></script>
+
+
+  <!-- open-iconic-bootstrap (icon set for bootstrap) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic-bootstrap.min.css" integrity="sha256-BJ/G+e+y7bQdrYkS2RBTyNfBHpA9IuGaPmf9htub5MQ=" crossorigin="anonymous" />
+</html>

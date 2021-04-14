@@ -1,0 +1,135 @@
+.container-fluid {
+  overflow-x: hidden;
+}
+
+#sidebar { /* Only visible on md screen size and up */
+  z-index: 990; /* we need to set some value>0 here for the links to work */
+  width: 250px;
+  position: fixed;
+  margin-left: 1rem;
+  border-right-style: solid;
+  border-right-color: #dddddd;
+  border-right-width: 1px;
+  background-color: #ffffff;
+  min-height: 100%;
+}
+#sidebar .list-group-item {
+  border-width: 0px;
+}
+
+#sidebar .list-group-item a {
+  text-decoration: none;
+}
+
+#sidebar a {
+  color: #343a40;
+}
+
+.redundantCard {
+  background-color: #003f5c;
+}
+
+.uniqueCard {
+  background-color: #444e86;
+}
+
+@media (min-width: 768px) {
+  .main {
+    padding-left: calc(250px + 2rem);
+    padding-right: 2rem;
+    padding-top: 1rem;
+    padding-bottom: 0rem;
+    background-color: #fcfcfc;
+  }
+  #content-navbar-row {
+    padding-top: 3.6rem;
+  }
+}
+@media (max-width: 767px) {
+  .main {
+    padding: 1rem 2rem 0rem 2rem;
+    background-color: #fcfcfc;
+  }
+  #content-navbar-row {
+    padding-top: 3.4rem;
+  }
+}
+
+/* Dropdowns/User profile */
+.navbar-dark .navbar-text {
+  color: #ffffff;
+}
+
+.oi {
+  width: 1.5rem;
+  text-align: center;
+}
+
+/* username link */
+.user-name-link .rounded-circle {
+  margin-left: -6px;
+}
+
+/* top row: contains numbers */
+.top-number-card {
+  min-height: 100%;
+}
+
+.top-number-col {
+  margin-bottom: 1.5em;
+}
+
+.top-number-card h5 {
+  font-size: 1.0rem;
+}
+
+.chart-div {
+  height: 300px;
+}
+
+.top-small-number {
+  font-size: 1.5em;
+}
+
+.top-small-caption {
+  font-size: 0.75em;
+  line-height: 1.25em;
+}
+
+.top-properties-card {
+  color: #ffffff;
+  min-height:100%;
+}
+
+.tpc-orange {
+  background-color: #E67E22;
+}
+
+.tpc-small-row {
+  text-align: center;
+  margin: 0em;
+}
+
+/* dash panels (6-12 cols wide) */
+.dash-panel-col {
+  margin-bottom: 1.5em;
+}
+
+
+/* available properties list */
+.property-list {
+  height: 300px;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: auto;
+}
+
+.available-price {
+  font-size: 0.8em;
+  padding-top: 0.2em;
+}
+
+/* maintenance */
+.badge-orange {
+  background-color: #E67E22;
+  color: #FFFFFF;
+}

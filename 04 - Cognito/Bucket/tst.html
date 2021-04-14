@@ -1,0 +1,54 @@
+
+<html>
+<head>
+    <title>test</title>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/lib/axios/dist/axios.standalone.js"></script>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/lib/CryptoJS/rollups/hmac-sha256.js"></script>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/lib/CryptoJS/rollups/sha256.js"></script>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/lib/CryptoJS/components/hmac.js"></script>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/lib/CryptoJS/components/enc-base64.js"></script>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/lib/url-template/url-template.js"></script>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/lib/apiGatewayCore/sigV4Client.js"></script>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/lib/apiGatewayCore/apiGatewayClient.js"></script>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/lib/apiGatewayCore/simpleHttpClient.js"></script>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/lib/apiGatewayCore/utils.js"></script>
+    <script type="text/javascript" src="js/apiGateway-js-sdk/apigClient.js"></script>    
+    
+
+</head>
+<body>
+
+
+
+
+    <script type="text/javascript">
+        
+        var dataList = []
+
+        var apigClient = apigClientFactory.newClient();        
+
+        apigClient.emotionsGet({}, null, {})
+        .then(function(result){
+            
+            console.log(result.data)
+            dataList = result.data
+            for(i=0; i<dataList.length ; i++){
+                // alert(dataList[i])
+                console.log(dataList[i]['emotion'][0])
+            }            
+
+        }).catch( function(result){
+            //This is where you would put an error callback
+            alert('erorr')
+        });
+
+
+        
+
+        
+
+
+    </script>
+    
+</body>
+</html>
